@@ -1,0 +1,16 @@
+{ 
+  "name": "tea-ga",
+  "version": "1.0.0",
+  "description": "Giveaway Bot for Tea Discord",
+  "main": "bot.js",
+  "author": "kingsuhas.eth",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^13.7.0",
+    "dotenv": "^16.0.1"
+  }
+}
