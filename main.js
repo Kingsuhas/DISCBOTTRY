@@ -1,5 +1,9 @@
 const { Client, Intents} = require('discord.js');
 
+const dotenv = require('dotenv');
+
+dotenv.config({path:"./.env"})
+
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 client.on('ready' , () => {
@@ -7,9 +11,16 @@ client.on('ready' , () => {
 });
 
 client.on('messageCreate' , msg =>{
-        if (msg.content == ".name"){
-            msg.reply(msg.author.username);
-        }
+    if(msg.author.bot) return
+
+    if(msg.channel.type == "dm") return
+
+    // const prefix = `${process.env.PREFIX}`
+    // if(!msg.content.toLowerCase().startsWith(prefix)) return
+
+    if (msg.content == ".name"){
+        msg.reply(msg.author.username);
+    }
     });
 
-client.login('OTc2NDExMzI2NjE0MjE2NzA0.GJQCDb.boodbR9CSzwZ5v9aY7S78p2lqGwZ8UQUc5r8PM');
+client.login(process.env.TOKEN);
