@@ -10,13 +10,12 @@ client.on('ready' , () => {
     console.log('GAbot is online');
 });
 
+
 client.on('messageCreate' , msg =>{
     if(msg.author.bot) return
 
     if(msg.channel.type == "dm") return
 
-    // const prefix = `${process.env.PREFIX}`
-    // if(!msg.content.toLowerCase().startsWith(prefix)) return
 
     if (msg.content == ".name"){
         msg.reply(msg.author.username);
