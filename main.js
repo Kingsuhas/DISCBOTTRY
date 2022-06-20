@@ -10,67 +10,54 @@ client.on('ready' , () => {
     console.log('GAbot is online');
 });
 
+
 client.on('interactionCreate', async interaction => {
-	if (!interaction.isCommand()) return;
+
+    if (interaction.customId === 'first') {
+        const nameResponse = interaction.fields.getTextInputValue('name');
+        const numberResponse = interaction.fields.getTextInputValue('number');
+        const timeResponse = interaction.fields.getTextInputValue('time');
+        console.log(nameResponse,numberResponse,timeResponse)
+        await interaction.reply({ content: 'Your submission was recieved successfully!' });
+    }
 
 	const { commandName } = interaction;
 
-	if (commandName === 'new') {
-		const row = new MessageActionRow()
-			.addComponents(
-				new MessageButton()
-					.setCustomId('primary')
-					.setLabel('START')
-					.setStyle('PRIMARY'),
-			);
-
-            const embed = new MessageEmbed()
-			.setColor('#0099ff')
-			.setTitle('Start a New Giveaway')
-			.setURL('https://discord.js.org')
-			.setDescription('Enter the name \n The number of winners And \n Time period of Giveaway');
-
-		await interaction.reply({ content: 'Pong!', ephemeral: true, embeds: [embed], components: [row] });
-	}
-
     if (interaction.commandName === 'ping') {
 		const modal = new Modal()
-			.setCustomId('myModal')
+			.setCustomId('first')
 			.setTitle('Giveaway Master');
 
         const nameInput = new TextInputComponent()
-			.setCustomId('nameInput')
+			.setCustomId('name')
 			.setLabel("Enter name of Giveaway")
-			.setStyle('SHORT');
+			.setStyle('SHORT')
+            .setPlaceholder('name');
 
         const numberInput = new TextInputComponent()
-			.setCustomId('numberInput')
+			.setCustomId('number')
 			.setLabel("Enter number of Winners")
-			.setStyle('SHORT')   
+			.setStyle('SHORT')
+            .setPlaceholder('number');   
             
         const timeInput = new TextInputComponent()
-			.setCustomId('timeInput')
+			.setCustomId('time')
 			.setLabel("Enter duration of Giveaway")
-			.setStyle('SHORT')    
+			.setStyle('SHORT') 
+            .setPlaceholder('duration');   
 
         const firstActionRow = new MessageActionRow().addComponents(nameInput);
         const secondActionRow = new MessageActionRow().addComponents(numberInput);
         const thirdActionRow = new MessageActionRow().addComponents(timeInput);            
         modal.addComponents(firstActionRow, secondActionRow, thirdActionRow);
 
-		await interaction.showModal(modal);
-	}
+		await interaction.showModal(modal, {
+            client: client,
+            interaction: interaction
+        });
+
+    }
 });
 
-client.on('messageCreate' , msg =>{
-    if(msg.author.bot) return
-
-    if(msg.channel.type == "dm") return
-
-
-    if (msg.content == ".name"){
-        msg.reply(msg.author.username);
-    }
-    });
 
 client.login(process.env.TOKEN);
