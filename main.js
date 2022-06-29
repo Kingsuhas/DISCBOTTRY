@@ -1,4 +1,4 @@
-const { Client, Intents, MessageActionRow, MessageButton, MessageEmbed, Modal, TextInputComponent} = require('discord.js');
+const { Client, Intents, MessageActionRow, Modal, TextInputComponent} = require('discord.js');
 
 const dotenv = require('dotenv');
 
@@ -24,6 +24,11 @@ client.on('interactionCreate', async interaction => {
 	const { commandName } = interaction;
 
     if (interaction.commandName === 'ping') {
+        if (!interaction.member.permissions.has(["ADMINISTRATOR"])){
+            interaction.reply("You don't have enough permissions to start a giveaway !")
+            return
+        }  
+
 		const modal = new Modal()
 			.setCustomId('first')
 			.setTitle('Giveaway Master');
