@@ -1,27 +1,85 @@
 const { Client, Intents, MessageActionRow, Modal, TextInputComponent} = require('discord.js');
 
+const { GiveawaysManager } = require('discord-giveaways');
+
+const ms = require('ms');
+
 const dotenv = require('dotenv');
 
 dotenv.config({path:"./.env"})
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
 
 client.on('ready' , () => {
     console.log('GAbot is online');
 });
 
+const manager = new GiveawaysManager(client, {
+    storage: './giveaways.json',
+    default: {
+        botsCanWin: false,
+        embedColor: '#FF0000',
+        embedColorEnd: '#000000',
+        reaction: '🎉'
+    }
+});
+
+client.giveawaysManager = manager;
 
 client.on('interactionCreate', async interaction => {
 
     if (interaction.customId === 'first') {
-        const nameResponse = interaction.fields.getTextInputValue('name');
-        const numberResponse = interaction.fields.getTextInputValue('number');
-        const timeResponse = interaction.fields.getTextInputValue('time');
-        console.log(nameResponse,numberResponse,timeResponse)
-        await interaction.reply({ content: 'Your submission was recieved successfully!' });
+        try {
+            const nameResponse = interaction.fields.getTextInputValue('name');
+            const numberResponse = parseInt(interaction.fields.getTextInputValue('number'));
+            const timeResponse = interaction.fields.getTextInputValue('time');
+            console.log(nameResponse,numberResponse,timeResponse)
+            await interaction.reply({ content: 'Your submission was recieved successfully!' });
+            client.giveawaysManager
+            .start(interaction.channel, {
+                duration: ms(`${timeResponse}`),
+                winnerCount: numberResponse,
+                prize: nameResponse,
+                hostedBy : interaction.user,
+                
+                messages: {
+                    giveaway: '🎉🎉 **GIVEAWAY** 🎉🎉',
+                    giveawayEnded: '🎉🎉 **GIVEAWAY ENDED** 🎉🎉',
+                    drawing: 'Time Remaining: {timestamp}',
+                    dropMessage: 'Be the first to react with 🎉 !',
+                    inviteToParticipate: 'React with 🎉 to participate!',
+                    winMessage: 'Congratulations, {winners}! You won **{this.prize}**!\n{this.messageURL}',
+                    embedFooter: '{this.winnerCount} winner(s)',
+                    noWinner: 'Giveaway cancelled, no valid participations.',
+                    hostedBy: 'Hosted by: {this.hostedBy}',
+                    winners: 'Winner(s):',
+                    endedAt: 'Ended at',
+
+                }
+            })
+            .then((data) => {
+                if(data) {
+                    console.log(data); // {...} (messageId, end date and more)
+                }
+            })
+            .catch(console.log("Error"));
+            // console.log(client.giveawaysManager);
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-	const { commandName } = interaction;
+    if (interaction.commandName === 're') {
+        const messageId = interaction.options.getString('message_id');
+        client.giveawaysManager
+            .reroll(messageId)
+            .then(() => {
+                interaction.reply('Success! Giveaway rerolled!');
+            })
+            .catch((err) => {
+                interaction.reply(`An error has occurred, please check and try again.\n\`${err}\``);
+            });
+    }
 
     if (interaction.commandName === 'ping') {
         if (!interaction.member.permissions.has(["ADMINISTRATOR"])){
@@ -60,7 +118,6 @@ client.on('interactionCreate', async interaction => {
             client: client,
             interaction: interaction
         });
-
     }
 });
 
